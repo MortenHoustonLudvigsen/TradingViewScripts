@@ -1,0 +1,27 @@
+//@version=6
+indicator(title="Relative Strength Index 2 / Stochastic", shorttitle="RSI2", format=format.price, precision=2, timeframe="", timeframe_gaps=true)
+
+rsiLength = 2
+rsiSource = close
+
+periodK = 5
+smoothK = 3
+periodD = 3
+k = ta.sma(ta.stoch(close, high, low, periodK), smoothK)
+d = ta.sma(k, periodD)
+
+
+change = ta.change(rsiSource)
+up = ta.rma(math.max(change, 0), rsiLength)
+down = ta.rma(-math.min(change, 0), rsiLength)
+rsi = down == 0 ? 100 : up == 0 ? 0 : 100 - (100 / (1 + up / down))
+
+rsiPlot = plot(rsi, "RSI", color=#7E57C2)
+rsiUpperBand = hline(90, "RSI Upper Band", color=#2A2E39, linestyle=hline.style_solid, linewidth=1)
+rsiLowerBand = hline(10, "RSI Lower Band", color=#2A2E39, linestyle=hline.style_solid, linewidth=1)
+midLinePlot = plot(50, color = na, editable = false, display = display.none)
+fill(rsiPlot, midLinePlot, 100, 80, top_color = color.new(#0C3299, 0), bottom_color = color.new(#0C3299, 100),  title = "Overbought Gradient Fill")
+fill(rsiPlot, midLinePlot, 20,  0,  top_color = color.new(#F06292, 100), bottom_color = color.new(#F06292, 0),      title = "Oversold Gradient Fill")
+
+plot(k, title="%K", color=#095248)
+plot(d, title="%D", color=#382473)
